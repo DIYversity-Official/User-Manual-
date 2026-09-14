@@ -153,8 +153,9 @@
     return { terms, list };
   }
 
-  function snippet(text, terms) {
-    const low = norm(text), MAX = 120;
+  // 휴대폰에서는 위키가 해당 위치로 스크롤되지 않으므로 첫 줄은 길게 보여 줘 카드만 읽어도 답이 되게 한다
+  function snippet(text, terms, MAX = 120) {
+    const low = norm(text);
     let idx = -1;
     for (const t of terms) { const i = low.indexOf(t); if (i >= 0 && (idx < 0 || i < idx)) idx = i; }
     let start = 0, end = text.length;
@@ -196,7 +197,7 @@
       const picks = s.hits.slice(0, 2).map((h) => h.it);
       if (!picks.length) { const first = SEC_FIRST.get(s.si); if (first) picks.push(first); }
       const snips = picks.filter((it) => it.text !== head)
-        .map((it) => '<p class="snip">' + snippet(it.text, terms) + '</p>').join('');
+        .map((it, k) => '<p class="snip">' + snippet(it.text, terms, k === 0 ? 280 : 120) + '</p>').join('');
       return '<a class="hit" href="' + link(s.si) + '">' +
         (head ? '<span class="page">' + esc(page) + '</span><span class="head">' + snippet(head, terms) + '</span>'
               : '<span class="head">' + snippet(page, terms) + '</span>') +
