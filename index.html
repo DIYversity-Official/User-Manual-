@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DIYversity 매뉴얼 검색</title>
+<meta name="description" content="DIYversity 앱·제어기 사용자 매뉴얼 전체에서 낱말을 찾습니다.">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔍</text></svg>">
+<style>
+  :root {
+    --fg: #1f2328; --muted: #59636e; --line: #d1d9e0; --soft: #f6f8fa;
+    --accent: #0969da; --mark: #fff1a8; --focus: #0969da33;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: #ffffff; color: var(--fg);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    word-break: keep-all; overflow-wrap: anywhere;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 16px; }
+  header { padding: 20px 0 4px; }
+  .brand { color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 600; }
+  .brand:hover { color: var(--accent); }
+  h1 { margin: 2px 0 0; font-size: 26px; line-height: 1.3; letter-spacing: -0.02em; }
+  .bar { position: sticky; top: 0; z-index: 5; background: #ffffff; padding: 12px 0; border-bottom: 1px solid transparent; }
+  .bar.stuck { border-bottom-color: var(--line); }
+  .box { position: relative; }
+  .box svg { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: var(--muted); pointer-events: none; }
+  #q {
+    width: 100%; height: 52px; padding: 0 48px 0 46px; border: 2px solid var(--line); border-radius: 12px;
+    font: inherit; font-size: 17px; color: var(--fg); background: #ffffff; outline: none; -webkit-appearance: none; appearance: none;
+  }
+  #q::-webkit-search-cancel-button { display: none; }
+  #q:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--focus); }
+  #clear {
+    position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px;
+    border: 0; border-radius: 10px; background: transparent; color: var(--muted); font-size: 18px; cursor: pointer;
+  }
+  #clear:hover { background: var(--soft); }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 6px; }
+  .chips span { font-size: 14px; color: var(--muted); align-self: center; margin-right: 2px; }
+  .chips button {
+    border: 1px solid var(--line); background: #ffffff; color: var(--fg); border-radius: 999px;
+    padding: 5px 14px; font: inherit; font-size: 15px; cursor: pointer;
+  }
+  .chips button:hover { border-color: var(--accent); color: var(--accent); }
+  #meta { margin: 14px 0 4px; font-size: 14px; color: var(--muted); }
+  #meta b { color: var(--fg); }
+  .hit {
+    display: block; margin: 10px 0; padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px;
+    color: inherit; text-decoration: none; transition: border-color .12s, background-color .12s;
+  }
+  .hit:hover { border-color: var(--accent); }
+  .hit:active { background: var(--soft); }
+  .page { display: block; font-size: 13px; font-weight: 600; color: var(--accent); }
+  .head { display: block; margin-top: 1px; font-size: 16.5px; font-weight: 700; line-height: 1.45; }
+  .snip { margin: 6px 0 0; font-size: 15px; color: #31363c; }
+  .snip + .snip { margin-top: 4px; padding-top: 4px; border-top: 1px dashed var(--line); }
+  mark { background: var(--mark); color: inherit; border-radius: 3px; padding: 0 1px; }
+  .empty { margin: 18px 0; padding: 18px; background: var(--soft); border-radius: 12px; }
+  .empty p { margin: 0 0 6px; }
+  .empty ul { margin: 6px 0 0; padding-left: 20px; color: var(--muted); font-size: 15px; }
+  .intro { margin: 18px 0; color: var(--muted); font-size: 15px; }
+  #more {
+    display: block; width: 100%; margin: 6px 0 0; padding: 12px; border: 1px solid var(--line); border-radius: 12px;
+    background: #ffffff; font: inherit; font-size: 15px; color: var(--accent); cursor: pointer;
+  }
+  footer { margin: 28px 0 32px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+  footer a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+<header class="wrap">
+  <a class="brand" id="home" href="https://github.com/DIYversity-Official/User-Manual-/wiki/DIYversity-%EB%A9%94%EB%89%B4%EC%96%BC">📘 DIYversity 매뉴얼</a>
+  <h1>매뉴얼 검색</h1>
+</header>
+
+<div class="bar" id="bar">
+  <div class="wrap">
+    <form class="box" id="form" role="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+      <input id="q" type="search" placeholder="찾을 낱말 (예: 깜빡, 비밀번호)" autocomplete="off" enterkeyhint="search" aria-label="매뉴얼에서 찾을 낱말">
+      <button type="button" id="clear" aria-label="지우기" hidden>✕</button>
+    </form>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="chips" id="chips"><span>자주 찾는 낱말</span></div>
+  <p id="meta" aria-live="polite">검색 목록을 불러오는 중…</p>
+  <div id="results"></div>
+  <noscript><div class="empty"><p>검색을 쓰려면 브라우저의 자바스크립트를 켜 주세요.</p><p><a href="https://github.com/DIYversity-Official/User-Manual-/wiki/DIYversity-%EB%A9%94%EB%89%B4%EC%96%BC">매뉴얼 목차로 가기</a></p></div></noscript>
+</main>
+
+<footer class="wrap">
+  <a href="https://github.com/DIYversity-Official/User-Manual-/wiki/DIYversity-%EB%A9%94%EB%89%B4%EC%96%BC">📘 매뉴얼 처음으로</a>
+  <span id="built"></span>
+</footer>
+
+<script>
+(() => {
+  const WIKI = 'https://github.com/DIYversity-Official/User-Manual-/wiki/';
+  const CHIPS = ['깜빡', '초기화', '비밀번호', '과전류', '업데이트', '그룹', '시퀀스', '위젯'];
+  const PAGE_SIZE = 30;
+  const $ = (id) => document.getElementById(id);
+  const input = $('q'), results = $('results'), meta = $('meta'), clearBtn = $('clear');
+  const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const norm = (s) => s.normalize('NFC').toLowerCase();
+  const reEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+  let DB = null, ITEMS = [], SEC_FIRST = new Map(), shown = PAGE_SIZE, lastQ = null;
+
+  CHIPS.forEach((w) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = w;
+    b.addEventListener('click', () => { input.value = w; run(true); });
+    $('chips').appendChild(b);
+  });
+
+  const count = (hay, t) => { let n = 0, i = hay.indexOf(t); while (i >= 0 && n < 5) { n++; i = hay.indexOf(t, i + t.length); } return n; };
+
+  function search(q) {
+    const qn = norm(q).trim().replace(/\s+/g, ' ');
+    const terms = qn.split(' ').filter(Boolean);
+    if (!terms.length) return { terms, list: [] };
+    const joined = qn.replace(/ /g, '');
+    const secs = new Map();
+    for (const it of ITEMS) {
+      let score = 0, inText = true;
+      for (const t of terms) {
+        const tT = it.t.includes(t) || it.tn.includes(t);
+        const tH = it.h.includes(t), tP = it.p.includes(t);
+        if (!tT && !tH && !tP) { score = -1; break; }
+        if (!tT) inText = false;
+        score += (tH ? 6 : 0) + (tP ? 3 : 0) + (tT ? 2 + Math.min(count(it.t, t), 3) : 0);
+      }
+      if (score < 0) {
+        if (terms.length > 1 && it.tn.includes(joined)) { score = 4; inText = true; } else continue;
+      }
+      if (terms.length > 1 && it.t.includes(qn)) score += 5;
+      let s = secs.get(it.si);
+      if (!s) { s = { si: it.si, best: 0, hits: [] }; secs.set(it.si, s); }
+      s.best = Math.max(s.best, score);
+      if (inText) s.hits.push({ it, score });
+    }
+    const list = [...secs.values()].map((s) => {
+      s.score = s.best + Math.min(Math.max(s.hits.length - 1, 0), 4) * 0.5;
+      s.hits.sort((a, b) => b.score - a.score || a.it.i - b.it.i);
+      return s;
+    }).sort((a, b) => b.score - a.score || a.si - b.si);
+    return { terms, list };
+  }
+
+  function snippet(text, terms) {
+    const low = norm(text), MAX = 120;
+    let idx = -1;
+    for (const t of terms) { const i = low.indexOf(t); if (i >= 0 && (idx < 0 || i < idx)) idx = i; }
+    let start = 0, end = text.length;
+    if (text.length > MAX) {
+      start = idx < 0 ? 0 : Math.max(0, idx - 36);
+      end = Math.min(text.length, start + MAX);
+      start = Math.max(0, end - MAX);
+    }
+    const part = text.slice(start, end);
+    const re = new RegExp('(' + terms.map(reEsc).join('|') + ')', 'gi');
+    const body = part.split(re).map((p, i) => (i % 2 ? '<mark>' + esc(p) + '</mark>' : esc(p))).join('');
+    return (start > 0 ? '…' : '') + body + (end < text.length ? '…' : '');
+  }
+
+  function link(sec) {
+    const [pi, , anchor] = DB.sections[sec];
+    return WIKI + encodeURIComponent(DB.pages[pi].p) + (anchor ? '#' + encodeURIComponent(anchor) : '');
+  }
+
+  function render(q, res) {
+    const { terms, list } = res;
+    if (!terms.length) {
+      meta.innerHTML = '';
+      results.innerHTML = '<p class="intro">매뉴얼 전체(1~23장)에서 낱말을 찾습니다. 조사를 빼고 짧게 넣을수록 잘 찾습니다. (예: “깜빡입니다” → <b>깜빡</b>)</p>';
+      return;
+    }
+    if (!list.length) {
+      meta.innerHTML = '';
+      results.innerHTML = '<div class="empty"><p><b>‘' + esc(q) + '’</b> 에 맞는 내용이 없습니다.</p>' +
+        '<ul><li>낱말을 짧게 줄여 보세요. (예: “초기화하는 법” → 초기화)</li><li>화면에 뜬 문구라면 앞부분 두세 낱말만 넣어 보세요.</li>' +
+        '<li><a href="' + WIKI + encodeURIComponent('DIYversity-메뉴얼') + '">매뉴얼 목차</a>에서 찾아보세요.</li></ul></div>';
+      return;
+    }
+    meta.innerHTML = '<b>‘' + esc(q) + '’</b> 검색 결과 ' + list.length + '곳';
+    const html = list.slice(0, shown).map((s) => {
+      const [pi, head] = DB.sections[s.si];
+      const page = DB.pages[pi].t;
+      const picks = s.hits.slice(0, 2).map((h) => h.it);
+      if (!picks.length) { const first = SEC_FIRST.get(s.si); if (first) picks.push(first); }
+      const snips = picks.filter((it) => it.text !== head)
+        .map((it) => '<p class="snip">' + snippet(it.text, terms) + '</p>').join('');
+      return '<a class="hit" href="' + link(s.si) + '">' +
+        (head ? '<span class="page">' + esc(page) + '</span><span class="head">' + snippet(head, terms) + '</span>'
+              : '<span class="head">' + snippet(page, terms) + '</span>') +
+        snips + '</a>';
+    }).join('');
+    results.innerHTML = html + (list.length > shown ? '<button type="button" id="more">결과 ' + (list.length - shown) + '곳 더 보기</button>' : '');
+    const more = $('more');
+    if (more) more.addEventListener('click', () => { shown += PAGE_SIZE; render(q, res); });
+  }
+
+  let timer = 0;
+  function run(now) {
+    clearTimeout(timer);
+    const go = () => {
+      const q = input.value;
+      clearBtn.hidden = !q;
+      if (!DB) return;
+      if (q !== lastQ) shown = PAGE_SIZE;
+      lastQ = q;
+      render(q.trim(), search(q));
+      const url = q.trim() ? '?q=' + encodeURIComponent(q.trim()) : location.pathname;
+      history.replaceState(null, '', url);
+    };
+    now === true ? go() : (timer = setTimeout(go, 150));
+  }
+
+  input.addEventListener('input', run);
+  input.addEventListener('compositionend', run);
+  $('form').addEventListener('submit', (e) => { e.preventDefault(); run(true); input.blur(); });
+  clearBtn.addEventListener('click', () => { input.value = ''; run(true); input.focus(); });
+
+  const bar = $('bar');
+  const onScroll = () => bar.classList.toggle('stuck', bar.getBoundingClientRect().top <= 0 && window.scrollY > 0);
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  input.value = new URLSearchParams(location.search).get('q') || '';
+  clearBtn.hidden = !input.value;
+
+  fetch('search-index.json', { cache: 'no-cache' })
+    .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then((d) => {
+      DB = d;
+      ITEMS = d.items.map(([si, text], i) => {
+        const [pi, head] = d.sections[si];
+        const t = norm(text);
+        const it = { i, si, text, t, tn: t.replace(/\s+/g, ''), h: norm(head), p: norm(d.pages[pi].t) };
+        if (!SEC_FIRST.has(si) && text !== head) SEC_FIRST.set(si, it);
+        return it;
+      });
+      $('built').textContent = ' · 검색 목록 갱신 ' + d.built;
+      run(true);
+      if (!input.value && window.matchMedia('(hover: hover)').matches) input.focus();
+    })
+    .catch(() => { meta.textContent = '검색 목록을 불러오지 못했습니다. 잠시 뒤 새로고침해 주세요.'; });
+})();
+</script>
+</body>
+</html>
