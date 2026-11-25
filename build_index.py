@@ -54,6 +54,8 @@ def build(wiki_dir):
     pages, sections, items = [], [], []
     for name in names:
         md = open(os.path.join(wiki_dir, name + ".md"), encoding="utf-8").read()
+        if "<!-- moved -->" in md:   # 옮긴 페이지 안내(옛 주소)는 검색에서 뺀다
+            continue
         md = flatten_html_tables(md)
         lines = md.split("\n")
         title = next((inline(l[2:]) for l in lines if l.startswith("# ")), name)
