@@ -16,7 +16,7 @@
 
 - 화면 문구는 다운라이트 펌웨어 v3.0.3 에 든 기기 화면 문구를 그대로 옮겼습니다.
 - 확인하지 못한 사양·사진은 **"기입 예정"** 으로, 더 확인할 문장은 `<!-- 검토 필요 -->` 주석으로 남겼습니다.
-- 그림: `images/dl-product/topology.svg`(설치 구성), `images/dl-layout/layout-examples.svg`(배치·묶음 예시). 앱 화면 캡처는 `images/dl-layout/`, `images/dl-gap/`, `images/dl-light/`, `images/dl-power/` 에 들어갑니다.
+- 그림: `images/dl-product/topology.svg`(설치 구성), `images/dl-layout/layout-examples.svg`(배치·묶음 예시). 앱 화면 캡처 9장: `images/dl-layout/`, `images/dl-gap/`, `images/dl-light/`, `images/dl-power/`.
 
 ## 옛 이름 → 새 이름
 
